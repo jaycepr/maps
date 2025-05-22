@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Mapping Software Comparison</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0052CC; /* Mapsly Blue */
+            --secondary-color: #5E4AE3; /* Mapsly Purple */
+            --accent-color: #00A3BF; /* Mapsly Teal / Maptive Color */
+            --neutral-dark: #072C4D; /* Mapsly Navy */
+            --neutral-medium: #505F79;
+            --neutral-light: #F0F4F8; /* Light Gray */
+            --text-color: #333;
+            --text-color-light: #FFFFFF;
+            --success-color: #27AE60; /* Badger Green */
+            --warning-color: #F39C12; /* Geopointe Orange */
+            --error-color: #E74C3C;   /* General Error/Old Maptive Red */
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--neutral-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--text-color-light);
+            min-height: 100vh;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--neutral-dark);
+            padding: 0.8rem 0; /* Adjusted padding */
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            color: var(--text-color-light);
+            font-size: 1.7rem; /* Increased */
+            font-weight: 700;
+            font-family: var(--font-heading);
+        }
+        
+        .nav-links-container {
+            display: flex; /* For desktop */
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 1.2rem; /* Adjusted gap */
+        }
+
+        .nav-links a {
+            color: var(--text-color-light);
+            text-decoration: none;
+            padding: 0.7rem 1.3rem; /* Adjusted padding */
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .menu-toggle {
+            display: none; /* Hidden by default */
+            background: none;
+            border: none;
+            color: var(--text-color-light);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+
+        /* Sections */
+        .section {
+            padding: 4rem 2rem;
+            min-height: 80vh;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section h1, .section h2 { /* Combined for heading font */
+            font-family: var(--font-heading);
+            color: var(--neutral-dark);
+            text-align: center;
+            font-weight: 700;
+        }
+        .section h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+
+        /* Overview Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--neutral-medium);
+            margin-bottom: 3.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tool-logos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); /* Adjusted minmax */
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .tool-logo-card { /* Renamed from .tool-logo for clarity */
+            background: var(--text-color-light);
+            padding: 2rem; /* Adjusted padding */
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tool-logo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
+        }
+        
+        .overview-logo-img {
+            max-height: 60px; /* Control logo size */
+            max-width: 150px;
+            object-fit: contain;
+            margin-bottom: 1.5rem; /* Space below logo */
+        }
+
+        .tool-logo-card h3 {
+            font-family: var(--font-heading);
+            color: var(--neutral-dark);
+            margin-bottom: 0.75rem;
+            font-size: 1.5rem; /* Increased */
+            font-weight: 600;
+        }
+        .tool-logo-card p {
+            font-size: 0.95rem;
+            color: var(--neutral-medium);
+            flex-grow: 1; /* Allows p to take space if cards are uneven */
+        }
+
+
+        /* Table Section */
+        .comparison-table {
+            overflow-x: auto;
+            margin: 2.5rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--text-color-light);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        th, td {
+            padding: 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid var(--neutral-light);
+            position: relative;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: var(--text-color-light);
+            font-weight: 600;
+            font-size: 1.1rem;
+            font-family: var(--font-heading);
+        }
+
+        td {
+            transition: all 0.3s ease;
+            color: var(--neutral-dark);
+            font-size: 0.95rem;
+        }
+         tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #E9F2FF;
+        }
+
+        .tooltip {
+            position: fixed;
+            background: var(--neutral-dark);
+            color: var(--text-color-light);
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.85rem;
+            z-index: 1010;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: 220px;
+            box-shadow: var(--shadow-sm);
+            transform: translateY(5px);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .chart-container {
+            background: var(--text-color-light);
+            padding: 2.5rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-container h3 {
+            font-family: var(--font-heading);
+            color: var(--neutral-dark);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.6rem; /* Increased */
+            font-weight: 600;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 350px;
+        }
+
+        /* Tool Profiles */
+        .tool-profiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .tool-profile {
+            background: var(--text-color-light);
+            padding: 2rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tool-profile:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-logo-img { /* For logos in profile cards */
+            width: auto; /* Let height control */
+            height: 50px; /* Control logo height */
+            max-width: 150px; /* Prevent overly wide logos */
+            object-fit: contain;
+            margin-right: 1.5rem;
+            border-radius: var(--border-radius-sm); /* Optional: if logos need rounded corners */
+        }
+
+
+        .profile-header h3 {
+            font-family: var(--font-heading);
+            font-size: 1.7rem; /* Increased */
+            color: var(--neutral-dark);
+            font-weight: 600;
+        }
+        .profile-header p.subtitle { /* Added class for subtitle */
+            font-size: 0.9rem;
+            color: var(--neutral-medium);
+            margin-top: 0.2rem;
+        }
+
+
+        .strengths {
+            list-style: none;
+            margin: 1rem 0;
+            padding-left: 0;
+        }
+
+        .strengths li {
+            padding: 0.6rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 0.95rem;
+            color: var(--neutral-dark);
+        }
+
+        .strengths li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .tool-profile p {
+            font-size: 0.95rem;
+            color: var(--neutral-medium);
+            margin-bottom: 0.5rem;
+        }
+        .tool-profile p strong {
+            color: var(--neutral-dark);
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) { /* Adjusted breakpoint for nav collapse */
+            .menu-toggle {
+                display: block; /* Show hamburger */
+            }
+            .nav-links-container {
+                display: none; /* Hide nav links container by default */
+                position: absolute;
+                top: 100%; /* Position below nav bar */
+                left: 0;
+                width: 100%;
+                background-color: var(--neutral-dark);
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            .nav-links-container.open {
+                display: flex; /* Show when toggled */
+            }
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            .nav-links a {
+                padding: 0.8rem 1rem;
+                width: 90%;
+                text-align: center;
+            }
+            .nav-links a:hover,
+            .nav-links a.active {
+                transform: none; /* Remove translateY on mobile */
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            .nav-content {
+                 /* Keep flex-direction row for logo and hamburger alignment */
+            }
+            .hero h1, .section h1 {
+                font-size: 2.5rem; /* Adjusted */
+            }
+            .hero p {
+                font-size: 1.1rem;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .tool-profiles {
+                grid-template-columns: 1fr;
+            }
+            .section {
+                padding: 2.5rem 1rem;
+            }
+            .section h2 {
+                font-size: 2.2rem; /* Adjusted */
+            }
+        }
+
+        /* Interactive Elements */
+        .interactive-btn {
+            background: var(--primary-color);
+            color: var(--text-color-light);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.3rem;
+            font-weight: 600;
+            font-family: var(--font-body); /* Ensure consistent font */
+        }
+
+        .interactive-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .interactive-btn.active-radar-btn {
+             background: var(--secondary-color);
+             box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+
+        .radar-controls {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-item {
+            background: var(--text-color-light);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: var(--border-radius-md);
+            border-left: 5px solid var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+        .question-item h3 {
+            font-family: var(--font-heading);
+            color: var(--neutral-dark);
+            font-size: 1.4rem; /* Increased */
+            margin-bottom: 0.75rem;
+        }
+        .question-item p {
+            color: var(--neutral-medium);
+            font-size: 1rem;
+        }
+         .question-item p strong {
+            color: var(--primary-color);
+            font-weight: 600;
+         }
+
+
+        .considerations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .consideration-card {
+            background: var(--text-color-light);
+            padding: 2rem;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .consideration-card h4 {
+            font-family: var(--font-heading);
+            color: var(--error-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem; /* Increased */
+            font-weight: 600;
+        }
+
+        .consideration-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .consideration-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.75rem;
+            position: relative;
+            font-size: 0.95rem;
+            color: var(--neutral-dark);
+        }
+
+        .consideration-list li::before {
+            content: '⚠';
+            position: absolute;
+            left: 0;
+            color: var(--warning-color);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="logo">Sales Mapping Tools</div>
+                <button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                    &#9776; </button>
+                <div class="nav-links-container">
+                    <ul class="nav-links">
+                        <li><a href="#overview" class="nav-link active">Overview</a></li>
+                        <li><a href="#table" class="nav-link">At-a-Glance</a></li>
+                        <li><a href="#insights" class="nav-link">Insights</a></li>
+                        <li><a href="#profiles" class="nav-link">Deep Dive</a></li>
+                        <li><a href="#recommendations" class="nav-link">Guidance</a></li>
+                        <li><a href="#considerations" class="nav-link">Considerations</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <section id="overview" class="section active">
+            <div class="hero">
+                <h1>Sales Mapping Software Comparison</h1>
+                <p>A comprehensive analysis of leading sales mapping tools to empower your team's decision-making process.</p>
+                
+                <div class="tool-logos">
+                    <div class="tool-logo-card">
+                        <img src="hq720.jpg" alt="Mapsly Logo" class="overview-logo-img">
+                        <h3>Mapsly</h3>
+                        <p>Advanced CRM mapping with powerful automation</p>
+                    </div>
+                    <div class="tool-logo-card">
+                        <img src="maptive.png" alt="Maptive Logo" class="overview-logo-img">
+                        <h3>Maptive</h3>
+                        <p>User-friendly data visualization platform</p>
+                    </div>
+                    <div class="tool-logo-card">
+                        <img src="geopointe_horizontal.png" alt="Geopointe Logo" class="overview-logo-img">
+                        <h3>Geopointe</h3>
+                        <p>Salesforce-native mapping solution</p>
+                    </div>
+                    <div class="tool-logo-card">
+                        <img src="logo-badger-login.png" alt="Badger Maps Logo" class="overview-logo-img">
+                        <h3>Badger Maps</h3>
+                        <p>Field sales optimization specialist</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="table" class="section">
+            <h2>At-a-Glance Comparison</h2>
+            <div class="comparison-table">
+                <table id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Mapsly</th>
+                            <th>Maptive</th>
+                            <th>Geopointe</th>
+                            <th>Badger Maps</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-tooltip="Estimated monthly pricing per user when billed annually.">Starting Price/User/Month</td>
+                            <td data-tooltip="Offers strong value with a comprehensive feature set. Contact for quote.">~$25 (Est.)</td>
+                            <td data-tooltip="One of the most affordable options for basic visualization.">~$21</td>
+                            <td data-tooltip="Premium pricing, especially for deep Salesforce integration.">$75</td>
+                            <td data-tooltip="Mid-range pricing, focused on field sales productivity.">$58</td>
+                        </tr>
+                        <tr>
+                            <td data-tooltip="Availability and depth of built-in connections to CRM systems.">CRM Integrations</td>
+                            <td data-tooltip="Extensive native integrations with deep, bi-directional sync.">15+ Native</td>
+                            <td data-tooltip="Primarily CSV/Excel import; API for custom integration.">Limited</td>
+                            <td data-tooltip="Exclusively Salesforce, but deeply integrated and native.">Salesforce Only</td>
+                            <td data-tooltip="Good range of popular CRMs with real-time sync.">10+ Native</td>
+                        </tr>
+                        <tr>
+                            <td data-tooltip="Built-in tools and features for discovering and qualifying new prospects.">Lead Generation</td>
+                            <td data-tooltip="Advanced prospecting via map search, AI analysis, and potential enrichment.">Excellent</td>
+                            <td data-tooltip="Basic lead identification from uploaded data; demographic overlays.">Basic</td>
+                            <td data-tooltip="Strong within Salesforce using existing data, Google Places search, and demographics.">Good</td>
+                            <td data-tooltip="Strong local lead finding for field sales.">Very Good</td>
+                        </tr>
+                        <tr>
+                            <td data-tooltip="Features for planning efficient routes and optimizing field sales activities.">Route Optimization</td>
+                            <td data-tooltip="Advanced routing features, often integrated with automation.">Advanced</td>
+                            <td data-tooltip="Includes basic route optimization tools.">Basic</td>
+                            <td data-tooltip="Good routing capabilities, especially within the Salesforce ecosystem.">Good</td>
+                            <td data-tooltip="Industry-leading route optimization, core to its offering.">Excellent</td>
+                        </tr>
+                        <tr>
+                            <td data-tooltip="Power and flexibility of data visualization, mapping tools, and analytics.">Visualization Power</td>
+                            <td data-tooltip="Comprehensive mapping, custom layers, filters, and AI-driven analytics.">Very Good</td>
+                            <td data-tooltip="Excellent for visualizing spreadsheet data with various map types (heat maps, etc.).">Excellent</td>
+                            <td data-tooltip="Good visualization of Salesforce data with thematic maps and filtering.">Good</td>
+                            <td data-tooltip="Practical sales mapping focused on territories and routes.">Good</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="insights" class="section">
+            <h2>Numerical & Graphical Insights</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Pricing Comparison</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="pricingChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Lead Generation Capability</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="leadGenChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>CRM Integration Matrix</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="crmChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Core Strengths Radar</h3>
+                    <div class="radar-controls">
+                        <button class="interactive-btn active-radar-btn" onclick="toggleRadarTool('Mapsly', this)">Mapsly</button>
+                        <button class="interactive-btn" onclick="toggleRadarTool('Maptive', this)">Maptive</button>
+                        <button class="interactive-btn" onclick="toggleRadarTool('Geopointe', this)">Geopointe</button>
+                        <button class="interactive-btn" onclick="toggleRadarTool('Badger Maps', this)">Badger Maps</button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="profiles" class="section">
+            <h2>Deep Dive - Tool Profiles</h2>
+            <div class="tool-profiles">
+                <div class="tool-profile">
+                    <div class="profile-header">
+                        <img src="hq720.jpg" alt="Mapsly Logo" class="profile-logo-img">
+                        <div>
+                            <h3>Mapsly</h3>
+                            <p class="subtitle">Advanced CRM Mapping Platform</p>
+                        </div>
+                    </div>
+                    <p><strong>Key Differentiators:</strong></p>
+                    <ul class="strengths">
+                        <li>Most comprehensive CRM integration (15+ platforms)</li>
+                        <li>Advanced automation and workflow capabilities</li>
+                        <li>Built-in prospecting with data enrichment</li>
+                        <li>Powerful territory management & AI Analysis</li>
+                        <li>Real-time bi-directional sync</li>
+                    </ul>
+                    <p><strong>Ideal For:</strong> Teams needing deep CRM integration with advanced automation and prospecting capabilities.</p>
+                    <p><strong>Pricing:</strong> Starting at ~$25/user/month (Est., Annual)</p>
+                </div>
+
+                <div class="tool-profile">
+                    <div class="profile-header">
+                         <img src="maptive.png" alt="Maptive Logo" class="profile-logo-img">
+                        <div>
+                            <h3>Maptive</h3>
+                            <p class="subtitle">Data Visualization Specialist</p>
+                        </div>
+                    </div>
+                    <p><strong>Key Differentiators:</strong></p>
+                    <ul class="strengths">
+                        <li>Excellent data visualization capabilities</li>
+                        <li>User-friendly interface, no coding</li>
+                        <li>Flexible data import options (Excel, Sheets)</li>
+                        <li>Good for market analysis & territory mapping</li>
+                        <li>Affordable pricing with short-term pass option</li>
+                    </ul>
+                    <p><strong>Ideal For:</strong> Teams prioritizing data visualization and ease of use over deep CRM integration.</p>
+                    <p><strong>Pricing:</strong> Starting at ~$21/user/month (Team, Annual)</p>
+                </div>
+
+                <div class="tool-profile">
+                    <div class="profile-header">
+                        <img src="geopointe_horizontal.png" alt="Geopointe Logo" class="profile-logo-img">
+                        <div>
+                            <h3>Geopointe</h3>
+                            <p class="subtitle">Salesforce Native Solution</p>
+                        </div>
+                    </div>
+                    <p><strong>Key Differentiators:</strong></p>
+                    <ul class="strengths">
+                        <li>Native Salesforce integration, AppExchange leader</li>
+                        <li>Seamless workflow within Salesforce</li>
+                        <li>Advanced territory management & geo-analytics</li>
+                        <li>Real-time data sync with Salesforce objects</li>
+                        <li>Google Places search & demographics</li>
+                    </ul>
+                    <p><strong>Ideal For:</strong> Salesforce-exclusive organizations wanting native mapping capabilities and geo-analytics.</p>
+                    <p><strong>Pricing:</strong> Starting at $75/user/month</p>
+                </div>
+
+                <div class="tool-profile">
+                    <div class="profile-header">
+                        <img src="logo-badger-login.png" alt="Badger Maps Logo" class="profile-logo-img">
+                        <div>
+                            <h3>Badger Maps</h3>
+                            <p class="subtitle">Field Sales Optimization</p>
+                        </div>
+                    </div>
+                    <p><strong>Key Differentiators:</strong></p>
+                    <ul class="strengths">
+                        <li>Best-in-class route optimization</li>
+                        <li>Field sales focused features (check-ins)</li>
+                        <li>Strong mobile app (iOS/Android, CarPlay)</li>
+                        <li>Local lead search for field reps</li>
+                        <li>Good CRM integrations (SFDC, HubSpot, etc.)</li>
+                    </ul>
+                    <p><strong>Ideal For:</strong> Field sales teams prioritizing route optimization and mobile functionality.</p>
+                    <p><strong>Pricing:</strong> Starting at $58/user/month (Annual)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="recommendations" class="section">
+            <h2>Key Decision Factors</h2>
+            <div class="question-item">
+                <h3>🤔 Is deep, bi-directional CRM sync critical?</h3>
+                <p><strong>If YES:</strong> Consider <strong>Mapsly</strong> (most comprehensive) or <strong>Geopointe</strong> (if Salesforce-only).</p>
+                <p><strong>If NO:</strong> <strong>Maptive</strong> or <strong>Badger Maps</strong> may suffice for simpler needs.</p>
+            </div>
+
+            <div class="question-item">
+                <h3>🏢 Are you a Salesforce-only organization?</h3>
+                <p><strong>If YES:</strong> <strong>Geopointe</strong> offers unmatched native integration and workflow.</p>
+                <p><strong>If NO:</strong> <strong>Mapsly</strong> or <strong>Badger Maps</strong> provide broader CRM flexibility.</p>
+            </div>
+
+            <div class="question-item">
+                <h3>🛣️ Is field sales route optimization your top priority?</h3>
+                <p><strong>If YES:</strong> <strong>Badger Maps</strong> leads in route optimization and mobile experience for field teams.</p>
+                <p><strong>If NO:</strong> Consider other factors like CRM integration depth or advanced visualization.</p>
+            </div>
+
+            <div class="question-item">
+                <h3>📊 Do you need advanced data visualization & analysis?</h3>
+                <p><strong>If YES:</strong> <strong>Maptive</strong> excels in data visualization from spreadsheets. <strong>Mapsly</strong> offers AI analysis.</p>
+                <p><strong>If NO:</strong> Focus on operational features like CRM sync and basic mapping.</p>
+            </div>
+
+            <div class="question-item">
+                <h3>💰 Is budget a primary constraint?</h3>
+                <p><strong>If YES:</strong> <strong>Maptive</strong> (~$21/user/month) offers great value for visualization.</p>
+                <p><strong>If NO:</strong> Explore feature-rich options like <strong>Mapsly</strong> or specialized solutions like <strong>Geopointe</strong>.</p>
+            </div>
+        </section>
+
+        <section id="considerations" class="section">
+            <h2>Important Considerations & Potential Red Flags</h2>
+            <div class="considerations">
+                <div class="consideration-card">
+                    <h4>Mapsly Considerations</h4>
+                    <ul class="consideration-list">
+                        <li>Pricing not publicly listed, requires quote</li>
+                        <li>Feature richness might mean a steeper learning curve</li>
+                        <li>May be overkill if only simple mapping is needed</li>
+                    </ul>
+                </div>
+
+                <div class="consideration-card">
+                    <h4>Maptive Considerations</h4>
+                    <ul class="consideration-list">
+                        <li>Limited direct CRM write-back capabilities</li>
+                        <li>Basic automation, less suited for complex sales processes</li>
+                        <li>Lead discovery is focused on uploaded data</li>
+                    </ul>
+                </div>
+
+                <div class="consideration-card">
+                    <h4>Geopointe Considerations</h4>
+                    <ul class="consideration-list">
+                        <li>Higher price point, especially for advanced routing</li>
+                        <li>Primarily for Salesforce users, limits flexibility</li>
+                        <li>Check current GDPR/data transfer documentation</li>
+                    </ul>
+                </div>
+
+                <div class="consideration-card">
+                    <h4>Badger Maps Considerations</h4>
+                    <ul class="consideration-list">
+                        <li>CRM integration costs extra for small teams on Business plan</li>
+                        <li>Advanced territory/HIPAA features on higher tiers</li>
+                        <li>UI visuals could be more modern for some users</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Data for the application
+        const toolsData = {
+            "Mapsly": {
+                "startingPricePerUserMonthAnnual": 25, // Estimated
+                "freeTrial": true,
+                "crmIntegrationScore": {"nativeIntegrations": "High", "syncDepth": "Excellent"},
+                "leadGenScore": 5,
+                "color": "var(--primary-color)", // Mapsly Blue
+                "radar": [5, 4, 5, 5, 4, 5] // Field Sales Opt., Data Viz, CRM Sync, Prospecting, Ease of Use, Automation
+            },
+            "Maptive": {
+                "startingPricePerUserMonthAnnual": 21,
+                "freeTrial": true,
+                "crmIntegrationScore": {"nativeIntegrations": "Low", "syncDepth": "Basic"},
+                "leadGenScore": 2,
+                "color": "var(--accent-color)", // Teal (Updated for Maptive)
+                "radar": [2, 5, 2, 2, 5, 3]
+            },
+            "Geopointe": {
+                "startingPricePerUserMonthAnnual": 75,
+                "freeTrial": true,
+                "crmIntegrationScore": {"nativeIntegrations": "Low", "syncDepth": "Excellent"}, // Salesforce only
+                "leadGenScore": 4,
+                "color": "var(--warning-color)", // Orange
+                "radar": [4, 3, 3, 4, 3, 4]
+            },
+            "Badger Maps": {
+                "startingPricePerUserMonthAnnual": 58,
+                "freeTrial": true,
+                "crmIntegrationScore": {"nativeIntegrations": "High", "syncDepth": "Good"},
+                "leadGenScore": 4,
+                "color": "var(--success-color)", // Green
+                "radar": [5, 3, 4, 4, 4, 3]
+            }
+        };
+
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinksContainer = document.querySelector('.nav-links-container');
+
+            // Mobile menu toggle
+            if (menuToggle && navLinksContainer) {
+                menuToggle.addEventListener('click', () => {
+                    navLinksContainer.classList.toggle('open');
+                    const isExpanded = navLinksContainer.classList.contains('open');
+                    menuToggle.setAttribute('aria-expanded', isExpanded);
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    link.classList.add('active');
+                    
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                    // Close mobile menu after click
+                    if (navLinksContainer && navLinksContainer.classList.contains('open')) {
+                        navLinksContainer.classList.remove('open');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+
+            initializeCharts();
+            addTooltipFunctionality();
+            addInteractiveEffects();
+            initializeRadarButtonStates(); 
+        });
+
+        // Tooltip functionality
+        function addTooltipFunctionality() {
+            const cells = document.querySelectorAll('td[data-tooltip]');
+            let tooltipElement;
+
+            cells.forEach(cell => {
+                cell.addEventListener('mouseenter', (e) => {
+                    if (tooltipElement) tooltipElement.remove(); 
+
+                    tooltipElement = document.createElement('div');
+                    tooltipElement.className = 'tooltip';
+                    tooltipElement.textContent = e.target.getAttribute('data-tooltip');
+                    
+                    document.body.appendChild(tooltipElement);
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    let top = rect.top - tooltipElement.offsetHeight - 8; 
+                    let left = rect.left + (rect.width / 2) - (tooltipElement.offsetWidth / 2);
+
+                    if (top < 0) { 
+                        top = rect.bottom + 8;
+                    }
+                    if (left < 0) left = 5; 
+                    if (left + tooltipElement.offsetWidth > window.innerWidth) {
+                        left = window.innerWidth - tooltipElement.offsetWidth - 5; 
+                    }
+
+                    tooltipElement.style.left = left + 'px';
+                    tooltipElement.style.top = top + 'px';
+                    
+                    void tooltipElement.offsetWidth; 
+                    tooltipElement.classList.add('show');
+                });
+                
+                cell.addEventListener('mouseleave', () => {
+                    if (tooltipElement) {
+                        tooltipElement.classList.remove('show');
+                        tooltipElement.addEventListener('transitionend', () => tooltipElement.remove(), { once: true });
+                    }
+                });
+            });
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            createPricingChart();
+            createLeadGenChart();
+            createCRMChart();
+            createRadarChart();
+        }
+
+        function createPricingChart() {
+            const ctx = document.getElementById('pricingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(toolsData),
+                    datasets: [{
+                        label: 'Price per User/Month ($)',
+                        data: Object.values(toolsData).map(tool => tool.startingPricePerUserMonthAnnual),
+                        backgroundColor: Object.values(toolsData).map(tool => tool.color),
+                        borderColor: Object.values(toolsData).map(tool => tool.color),
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const toolName = context.label;
+                                    const tool = toolsData[toolName];
+                                    return tool.freeTrial ? 'Free trial available' : 'No free trial mentioned';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Price ($)',
+                                font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-heading') }
+                            },
+                            ticks: { font: { family: getComputedStyle(document.body).getPropertyValue('--font-body') }}
+                        },
+                        x: {
+                             ticks: { font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-body') }}
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createLeadGenChart() {
+            const ctx = document.getElementById('leadGenChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(toolsData),
+                    datasets: [{
+                        label: 'Lead Generation Score (1-5)',
+                        data: Object.values(toolsData).map(tool => tool.leadGenScore),
+                        backgroundColor: Object.values(toolsData).map(tool => tool.color),
+                        borderColor: Object.values(toolsData).map(tool => tool.color),
+                        borderWidth: 1,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            title: {
+                                display: true,
+                                text: 'Score (1-5)',
+                                font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-heading') }
+                            },
+                            ticks: { font: { family: getComputedStyle(document.body).getPropertyValue('--font-body') }}
+                        },
+                         x: {
+                             ticks: { font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-body') }}
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function createCRMChart() {
+            const ctx = document.getElementById('crmChart').getContext('2d');
+            
+            const integrationMap = { 'Low': 1, 'Medium': 2, 'High': 3 };
+            const syncMap = { 'Basic': 1, 'Good': 2, 'Excellent': 3 };
+            
+            const scatterData = Object.entries(toolsData).map(([name, data]) => ({
+                x: integrationMap[data.crmIntegrationScore.nativeIntegrations] + (Math.random() * 0.2 - 0.1),
+                y: syncMap[data.crmIntegrationScore.syncDepth] + (Math.random() * 0.2 - 0.1),
+                label: name,
+                backgroundColor: data.color
+            }));
+
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: scatterData.map(point => ({ 
+                        label: point.label,
+                        data: [{ x: point.x, y: point.y }],
+                        backgroundColor: point.backgroundColor,
+                        borderColor: point.backgroundColor,
+                        pointRadius: 12, 
+                        pointHoverRadius: 15
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].dataset.label;
+                                },
+                                label: function(context) {
+                                    const toolName = context.dataset.label;
+                                    const tool = toolsData[toolName];
+                                    return `Integrations: ${tool.crmIntegrationScore.nativeIntegrations}, Sync: ${tool.crmIntegrationScore.syncDepth}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0.5, max: 3.5,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    const labels = ['', 'Low', 'Medium', 'High'];
+                                    return labels[Math.round(value)] || '';
+                                },
+                                font: { family: getComputedStyle(document.body).getPropertyValue('--font-body') }
+                            },
+                            title: { display: true, text: 'Native CRM Integrations', font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-heading') } }
+                        },
+                        y: {
+                            min: 0.5, max: 3.5,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    const labels = ['', 'Basic', 'Good', 'Excellent'];
+                                    return labels[Math.round(value)] || '';
+                                },
+                                font: { family: getComputedStyle(document.body).getPropertyValue('--font-body') }
+                            },
+                            title: { display: true, text: 'Depth of CRM Sync', font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-heading') } }
+                        }
+                    }
+                }
+            });
+        }
+
+        let radarChart;
+        let activeRadarTools = ['Mapsly']; 
+
+        function createRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const datasets = activeRadarTools.map(toolName => {
+                const tool = toolsData[toolName];
+                const colorValue = tool.color.startsWith('var') ? 
+                                   getComputedStyle(document.documentElement).getPropertyValue(tool.color.slice(4,-1)).trim() : 
+                                   tool.color;
+                const rgbColor = colorValue.startsWith('#') ? 
+                                 `${parseInt(colorValue.slice(1, 3), 16)}, ${parseInt(colorValue.slice(3, 5), 16)}, ${parseInt(colorValue.slice(5, 7), 16)}` :
+                                 colorValue; // Fallback if not hex, though CSS vars should resolve to hex/rgb
+
+                return {
+                    label: toolName,
+                    data: tool.radar,
+                    borderColor: `rgb(${rgbColor})`,
+                    backgroundColor: `rgba(${rgbColor}, 0.25)`, // Adjusted alpha
+                    pointBackgroundColor: `rgb(${rgbColor})`,
+                    pointBorderColor: `rgb(${rgbColor})`,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: `rgb(${rgbColor})`,
+                    borderWidth: 2.5,
+                };
+            });
+
+            if (radarChart) {
+                radarChart.destroy(); 
+            }
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Field Sales Opt.', 'Data Viz Power', 'CRM Sync', 'Prospecting', 'Ease of Use', 'Automation'],
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: { borderWidth: 3 }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: true, color: 'rgba(0,0,0,0.1)' }, 
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            pointLabels: { font: { size: 11, weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-body') } }, 
+                            grid: { color: 'rgba(0,0,0,0.1)' }, 
+                            ticks: {
+                                backdropColor: 'rgba(255,255,255,0.75)', 
+                                backdropPadding: 3,
+                                font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-body') },
+                                stepSize: 1 // Ensure integer ticks
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { font: { weight: '600', family: getComputedStyle(document.body).getPropertyValue('--font-body') } }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function initializeRadarButtonStates() {
+            const buttons = document.querySelectorAll('.radar-controls .interactive-btn');
+            buttons.forEach(btn => {
+                if (activeRadarTools.includes(btn.textContent)) {
+                    btn.classList.add('active-radar-btn');
+                } else {
+                    btn.classList.remove('active-radar-btn');
+                }
+            });
+        }
+
+
+        function toggleRadarTool(toolName, buttonElement) {
+            const index = activeRadarTools.indexOf(toolName);
+            if (index > -1) {
+                if (activeRadarTools.length > 1) { 
+                    activeRadarTools.splice(index, 1);
+                    buttonElement.classList.remove('active-radar-btn');
+                }
+            } else {
+                activeRadarTools.push(toolName);
+                 buttonElement.classList.add('active-radar-btn');
+            }
+            createRadarChart(); 
+        }
+
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.tool-logo-card')) { 
+                const navLink = document.querySelector('a[href="#profiles"]');
+                if (navLink) navLink.click();
+            }
+        });
+
+
+        function addInteractiveEffects() {
+            const cards = document.querySelectorAll('.tool-profile, .tool-logo-card, .consideration-card, .chart-container');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-6px)'; 
+                    this.style.transition = 'transform 0.25s ease-out, box-shadow 0.25s ease-out';
+                    if (!this.classList.contains('chart-container')) { 
+                         this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                     if (!this.classList.contains('chart-container')) {
+                        this.style.boxShadow = 'var(--shadow-md)';
+                     }
+                });
+            });
+        }
+
+
+        document.addEventListener('keydown', function(e) {
+            const sections = ['overview', 'table', 'insights', 'profiles', 'recommendations', 'considerations'];
+            const activeSectionElement = document.querySelector('.section.active');
+            if (!activeSectionElement) return;
+
+            const currentSectionId = activeSectionElement.id;
+            const currentIndex = sections.indexOf(currentSectionId);
+            
+            let newIndex = -1;
+            if (e.key === 'ArrowRight' && currentIndex < sections.length - 1) {
+                newIndex = currentIndex + 1;
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            }
+
+            if (newIndex !== -1) {
+                const navLinkToClick = document.querySelector(`a.nav-link[href="#${sections[newIndex]}"]`);
+                if (navLinkToClick) {
+                    navLinkToClick.click();
+                    const newSection = document.getElementById(sections[newIndex]);
+                    if (newSection) {
+                        const heading = newSection.querySelector('h1, h2');
+                        if (heading) heading.focus({preventScroll:true}); else newSection.focus({preventScroll:true}); 
+                        // Optional: scroll into view if default click behavior is not enough
+                        // newSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
